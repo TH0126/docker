@@ -1,0 +1,6 @@
+FROM postgres:13.4-alpine
+
+ENV TZ Asia/Tokyo
+ENV POSTGRES_USER=tding
+ENV POSTGRES_DB=tdingt_db
+ENV POSTGRES_HOST_AUTH_METHOD=trust

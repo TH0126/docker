@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  db:
+    build: ./docker/postgre
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-store:/var/lib/postgresql/data
+
+  web:
+    image: nginx:1.20.1-alpine
+    ports:
+      - 8000:8000
+    volumes :
+      - ./src:/workspace
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/uwsgi_params:/etc/nginx/uwsgi_params
+    working_dir:
+      /workspace
+    depends_on:
+      - app
+
+  app:
+      build: ./docker/python
+      command: uwsgi --socket :8001 --module config.wsgi --py-autoreload 1 --logto /tmp/tmp.log
+      volumes:
+        - ./src:/workspace
+      expose:
+        - "8001"
+      tty: true
+      stdin_open: true
+      depends_on:
+        - db
+
+volumes:
+  db-store:
